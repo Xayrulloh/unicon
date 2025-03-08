@@ -1,5 +1,6 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsString, IsUUID } from 'class-validator';
+import { OrganizationI } from 'src/common/interface/basic.interface';
 
 // Request
 export class CreateOrganizationDto {
@@ -29,7 +30,7 @@ export class AttachStaffOrganizationDto {
 }
 
 // Response
-export class FindAllOrganizationsDto {
+export class FindOrganizationDto implements OrganizationI {
   @ApiProperty()
   id: string;
 

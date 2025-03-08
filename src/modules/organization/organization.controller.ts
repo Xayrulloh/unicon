@@ -18,9 +18,10 @@ import { OrganizationService } from './organization.service';
 import {
   AttachStaffOrganizationDto,
   CreateOrganizationDto,
-  FindAllOrganizationsDto,
+  FindOrganizationDto,
   UpdateOrganizationDto,
 } from './organization.dto';
+import { OrganizationI } from 'src/common/interface/basic.interface';
 
 @ApiTags('Organization')
 @Controller('organization')
@@ -29,8 +30,8 @@ export class OrganizationController {
 
   @Get()
   @ApiOperation({ summary: 'Get all organization' })
-  @ApiResponse({ type: FindAllOrganizationsDto, isArray: true })
-  getAllOrganizations(): Promise<FindAllOrganizationsDto[]> {
+  @ApiResponse({ type: FindOrganizationDto, isArray: true })
+  getAllOrganizations(): Promise<OrganizationI[]> {
     return this.service.getAllOrganizations();
   }
 
@@ -54,17 +55,17 @@ export class OrganizationController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update organization' })
-  @ApiResponse({ type: FindAllOrganizationsDto })
+  @ApiResponse({ type: FindOrganizationDto })
   updateOrganization(
     @Param('id', new ParseUUIDPipe()) organizationId: string,
     @Body() organization: UpdateOrganizationDto,
-  ): Promise<FindAllOrganizationsDto> {
+  ): Promise<OrganizationI> {
     return this.service.updateOrganization(organizationId, organization);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete organization' })
-  @ApiResponse({ type: FindAllOrganizationsDto })
+  @ApiResponse({ type: FindOrganizationDto })
   deleteOrganization(
     @Param('id', new ParseUUIDPipe()) organizationId: string,
   ): Promise<void> {

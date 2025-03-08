@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsEnum, IsUUID } from 'class-validator';
+import { TaskI } from 'src/common/interface/basic.interface';
 import { TaskStatus } from 'src/utils/enums';
 
 // Request
-export class CreateTaskDto {
+export class CreateFindTaskDto {
   @ApiProperty()
   @IsUUID()
   projectId: string;
@@ -21,7 +22,7 @@ export class CreateTaskDto {
   due_date: string;
 }
 
-export class UpdateTaskDto {
+export class UpdateFindTaskDto {
   @ApiProperty({ enum: TaskStatus })
   @IsEnum(TaskStatus)
   status: TaskStatus;
@@ -51,7 +52,7 @@ export class GetTasksByProject {
 
 // Response
 
-export class TaskDto {
+export class FindTaskDto implements TaskI {
   @ApiProperty()
   id: string;
 

@@ -3,19 +3,20 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateAdminDto, CreateUserDto, FindAllUsersDto } from './user.dto';
+import { CreateAdminDto, CreateUserDto } from './user.dto';
 import { KnexService } from 'src/database/knex.service';
 import { Role } from 'src/utils/enums';
+import { UserI } from 'src/common/interface/basic.interface';
 
 @Injectable()
 export class UserService {
   constructor(private readonly knexService: KnexService) {}
 
-  async findOneUser(id: string): Promise<FindAllUsersDto> {
-    const user = (await this.knexService
-      .knex('users')
+  async findOneUser(id: string): Promise<UserI> {
+    const user = await this.knexService
+      .knex<UserI>('users')
       .where({ id })
-      .first()) as FindAllUsersDto;
+      .first();
 
     if (!user) {
       throw new Error('User not found');
@@ -24,9 +25,9 @@ export class UserService {
     return user;
   }
 
-  async createAdmin(data: CreateAdminDto): Promise<FindAllUsersDto> {
+  async createAdmin(data: CreateAdminDto): Promise<UserI> {
     const [admin] = await this.knexService
-      .knex<FindAllUsersDto>('users')
+      .knex<UserI>('users')
       .insert({
         name: data.name,
         role: Role.ADMIN,
@@ -37,13 +38,13 @@ export class UserService {
     return admin;
   }
 
-  async getAllUsers(): Promise<FindAllUsersDto[]> {
+  async getAllUsers(): Promise<UserI[]> {
     return this.knexService.knex('users').select('*');
   }
 
-  async createUser(data: CreateUserDto): Promise<FindAllUsersDto> {
+  async createUser(data: CreateUserDto): Promise<UserI> {
     const admin = await this.knexService
-      .knex<FindAllUsersDto>('users')
+      .knex<UserI>('users')
       .where({ id: data.created_by })
       .first();
 
@@ -56,7 +57,7 @@ export class UserService {
     }
 
     const [user] = await this.knexService
-      .knex<FindAllUsersDto>('users')
+      .knex<UserI>('users')
       .insert({
         name: data.name,
         role: data.role,

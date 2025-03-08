@@ -7,17 +7,17 @@ import { KnexService } from 'src/database/knex.service';
 import {
   AttachStaffOrganizationDto,
   CreateOrganizationDto,
-  FindAllOrganizationsDto,
   UpdateOrganizationDto,
 } from './organization.dto';
-import { FindAllUsersDto } from '../user/user.dto';
+import { FindUserDto } from '../user/user.dto';
 import { Role } from 'src/utils/enums';
+import { OrganizationI } from 'src/common/interface/basic.interface';
 
 @Injectable()
 export class OrganizationService {
   constructor(private readonly knexService: KnexService) {}
 
-  async getAllOrganizations(): Promise<FindAllOrganizationsDto[]> {
+  async getAllOrganizations(): Promise<OrganizationI[]> {
     return this.knexService.knex('organizations').select('*');
   }
 
@@ -25,7 +25,7 @@ export class OrganizationService {
     organization: CreateOrganizationDto,
   ): Promise<CreateOrganizationDto> {
     const user = await this.knexService
-      .knex<FindAllUsersDto>('users')
+      .knex<FindUserDto>('users')
       .where({ id: organization.created_by })
       .first();
 
@@ -38,7 +38,7 @@ export class OrganizationService {
     }
 
     const [organizationData] = await this.knexService
-      .knex<FindAllOrganizationsDto>('organizations')
+      .knex<OrganizationI>('organizations')
       .insert(organization)
       .returning('*');
 
@@ -49,7 +49,7 @@ export class OrganizationService {
     data: AttachStaffOrganizationDto,
   ): Promise<AttachStaffOrganizationDto> {
     const user = await this.knexService
-      .knex<FindAllUsersDto>('users')
+      .knex<FindUserDto>('users')
       .where({ id: data.created_by })
       .first();
 
@@ -62,7 +62,7 @@ export class OrganizationService {
     }
 
     const stuff = await this.knexService
-      .knex<FindAllUsersDto>('users')
+      .knex<FindUserDto>('users')
       .where({ id: data.userId })
       .first();
 
@@ -81,9 +81,9 @@ export class OrganizationService {
   async updateOrganization(
     organizationId: string,
     organization: UpdateOrganizationDto,
-  ): Promise<FindAllOrganizationsDto> {
+  ): Promise<OrganizationI> {
     const user = await this.knexService
-      .knex<FindAllUsersDto>('users')
+      .knex<FindUserDto>('users')
       .where({ id: organization.created_by })
       .first();
 
@@ -96,7 +96,7 @@ export class OrganizationService {
     }
 
     const organizationData = await this.knexService
-      .knex<FindAllOrganizationsDto>('organizations')
+      .knex<OrganizationI>('organizations')
       .where({ id: organizationId })
       .first();
 
@@ -105,7 +105,7 @@ export class OrganizationService {
     }
 
     const [updatedOrganizationData] = await this.knexService
-      .knex<FindAllOrganizationsDto>('organizations')
+      .knex<OrganizationI>('organizations')
       .where({ id: organizationId })
       .update(organization)
       .returning('*');
@@ -115,7 +115,7 @@ export class OrganizationService {
 
   async deleteOrganization(organizationId: string): Promise<void> {
     const organizationData = await this.knexService
-      .knex<FindAllOrganizationsDto>('organizations')
+      .knex<OrganizationI>('organizations')
       .where({ id: organizationId })
       .first();
 
@@ -124,7 +124,7 @@ export class OrganizationService {
     }
 
     await this.knexService
-      .knex<FindAllOrganizationsDto>('organizations')
+      .knex<OrganizationI>('organizations')
       .where({ id: organizationId })
       .delete();
   }

@@ -5,8 +5,9 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateAdminDto, CreateUserDto, FindAllUsersDto } from './user.dto';
+import { CreateAdminDto, CreateUserDto, FindUserDto } from './user.dto';
 import { UserService } from './user.service';
+import { UserI } from 'src/common/interface/basic.interface';
 
 @ApiTags('User')
 @Controller('user')
@@ -15,22 +16,22 @@ export class UserController {
 
   @Post('admin')
   @ApiOperation({ summary: 'Create admin' })
-  @ApiCreatedResponse({ type: FindAllUsersDto })
-  createAdmin(@Body() data: CreateAdminDto): Promise<FindAllUsersDto> {
+  @ApiCreatedResponse({ type: FindUserDto })
+  createAdmin(@Body() data: CreateAdminDto): Promise<UserI> {
     return this.service.createAdmin(data);
   }
 
   @Get('list')
   @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ type: FindAllUsersDto, isArray: true })
-  getAllUsers(): Promise<FindAllUsersDto[]> {
+  @ApiResponse({ type: FindUserDto, isArray: true })
+  getAllUsers(): Promise<UserI[]> {
     return this.service.getAllUsers();
   }
 
   @Post()
   @ApiOperation({ summary: 'Create user if you are admin' })
-  @ApiCreatedResponse({ type: FindAllUsersDto })
-  createUser(@Body() data: CreateUserDto): Promise<FindAllUsersDto> {
+  @ApiCreatedResponse({ type: FindUserDto })
+  createUser(@Body() data: CreateUserDto): Promise<UserI> {
     return this.service.createUser(data);
   }
 }

@@ -4,17 +4,18 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { KnexService } from 'src/database/knex.service';
-import { CreateProjectDto, ProjectDto, UpdateProjectDto } from './project.dto';
-import { FindAllUsersDto } from '../user/user.dto';
+import { CreateProjectDto, UpdateProjectDto } from './project.dto';
+import { FindUserDto } from '../user/user.dto';
 import { Role } from 'src/utils/enums';
+import { ProjectI } from 'src/common/interface/basic.interface';
 
 @Injectable()
 export class ProjectService {
   constructor(private readonly knexService: KnexService) {}
 
-  async createProject(data: CreateProjectDto): Promise<ProjectDto> {
+  async createProject(data: CreateProjectDto): Promise<ProjectI> {
     const user = await this.knexService
-      .knex<FindAllUsersDto>('users')
+      .knex<FindUserDto>('users')
       .where({ id: data.created_by })
       .first();
 
@@ -36,23 +37,23 @@ export class ProjectService {
     if (!isManager) throw new UnauthorizedException();
 
     const [project] = await this.knexService
-      .knex<ProjectDto>('projects')
+      .knex<ProjectI>('projects')
       .insert(data)
       .returning('*');
 
     return project;
   }
 
-  async getAllProjects(): Promise<ProjectDto[]> {
-    return this.knexService.knex<ProjectDto>('projects').select('*');
+  async getAllProjects(): Promise<ProjectI[]> {
+    return this.knexService.knex<ProjectI>('projects').select('*');
   }
 
   async updateProject(
     projectId: string,
     data: UpdateProjectDto,
-  ): Promise<ProjectDto> {
+  ): Promise<ProjectI> {
     const project = await this.knexService
-      .knex<ProjectDto>('projects')
+      .knex<ProjectI>('projects')
       .where({ id: projectId })
       .first();
 
@@ -61,7 +62,7 @@ export class ProjectService {
     }
 
     const [updatedProject] = await this.knexService
-      .knex<ProjectDto>('projects')
+      .knex<ProjectI>('projects')
       .where({ id: projectId })
       .update(data)
       .returning('*');
@@ -71,7 +72,7 @@ export class ProjectService {
 
   async deleteProject(projectId: string): Promise<void> {
     const project = await this.knexService
-      .knex<ProjectDto>('projects')
+      .knex<ProjectI>('projects')
       .where({ id: projectId })
       .first();
 
@@ -80,7 +81,7 @@ export class ProjectService {
     }
 
     await this.knexService
-      .knex<ProjectDto>('projects')
+      .knex<ProjectI>('projects')
       .where({ id: projectId })
       .delete();
   }

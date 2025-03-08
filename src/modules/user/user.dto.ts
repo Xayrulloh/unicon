@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsString, IsUUID } from 'class-validator';
+import { UserI } from 'src/common/interface/basic.interface';
 import { Role } from 'src/utils/enums';
 
 // Request
@@ -24,7 +25,7 @@ export class CreateAdminDto {
 }
 
 // Response
-export class FindAllUsersDto {
+export class FindUserDto implements UserI {
   @ApiProperty()
   id: string;
 

@@ -1,5 +1,6 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
 import { IsUUID, IsString } from 'class-validator';
+import { ProjectI } from 'src/common/interface/basic.interface';
 
 // Request
 export class CreateProjectDto {
@@ -20,7 +21,7 @@ export class UpdateProjectDto extends PartialType(
 ) {}
 
 // Response
-export class ProjectDto {
+export class FindProjectDto implements ProjectI {
   @ApiProperty()
   id: string;
 
