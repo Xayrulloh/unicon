@@ -15,11 +15,11 @@ export class CreateFindTaskDto {
 
   @ApiProperty()
   @IsUUID()
-  created_by: string;
+  createdBy: string;
 
   @ApiProperty()
   @IsDateString()
-  due_date: string;
+  dueDate: string;
 }
 
 export class UpdateFindTaskDto {
@@ -60,17 +60,17 @@ export class FindTaskDto implements TaskI {
   status: TaskStatus;
 
   @ApiProperty()
-  project_id: string;
+  projectId: string;
 
   @ApiProperty()
-  worker_user_id: string;
+  workerUserId: string;
 
   @ApiProperty()
-  created_by: string;
+  createdBy: string;
 
   @ApiProperty()
-  due_date: string;
+  dueDate: string;
 
   @ApiProperty()
-  done_at: string;
+  doneAt: string;
 }

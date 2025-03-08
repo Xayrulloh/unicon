@@ -19,16 +19,19 @@ export class OrganizationService {
   async createOrganization(
     organization: CreateOrganizationDto,
   ): Promise<CreateOrganizationDto> {
-    const user = await this.knexService.findUserById(organization.created_by);
+    const user = await this.knexService.findUserById(organization.createdBy);
 
     if (user.role !== Role.ADMIN) {
       throw new UnauthorizedException('Only admin can create organization');
     }
 
     const [organizationData] = await this.knexService
-      .knex<OrganizationI>('organizations')
-      .insert(organization)
-      .returning('*');
+      .knex('organizations')
+      .insert({
+        name: organization.name,
+        created_by: organization.createdBy,
+      })
+      .returning<OrganizationI[]>(['id', 'name', 'created_by as createdBy']);
 
     return organizationData;
   }
@@ -36,7 +39,7 @@ export class OrganizationService {
   async attachStaffOrganization(
     data: AttachStaffOrganizationDto,
   ): Promise<AttachStaffOrganizationDto> {
-    const user = await this.knexService.findUserById(data.created_by);
+    const user = await this.knexService.findUserById(data.createdBy);
 
     if (user.role !== Role.ADMIN) {
       throw new UnauthorizedException('Only admin can attach staff');
@@ -45,9 +48,15 @@ export class OrganizationService {
     await this.knexService.findUserById(data.userId, 'Stuff not found');
 
     const [organizationStuff] = await this.knexService
-      .knex<AttachStaffOrganizationDto>('organization_user')
-      .insert(data)
-      .returning('*');
+      .knex('organization_user')
+      .insert({
+        organization_id: data.organizationId,
+        user_id: data.userId,
+      })
+      .returning<AttachStaffOrganizationDto[]>([
+        'organization_id as organizationId',
+        'user_id as userId',
+      ]);
 
     return organizationStuff;
   }
@@ -56,7 +65,7 @@ export class OrganizationService {
     organizationId: string,
     organization: UpdateOrganizationDto,
   ): Promise<OrganizationI> {
-    const user = await this.knexService.findUserById(organization.created_by);
+    const user = await this.knexService.findUserById(organization.createdBy);
 
     if (user.role !== Role.ADMIN) {
       throw new UnauthorizedException('Only admin can update organization');
@@ -65,10 +74,10 @@ export class OrganizationService {
     await this.knexService.findOrganizationById(organizationId);
 
     const [updatedOrganizationData] = await this.knexService
-      .knex<OrganizationI>('organizations')
+      .knex('organizations')
       .where({ id: organizationId })
       .update(organization)
-      .returning('*');
+      .returning<OrganizationI[]>(['id', 'name', 'created_by as createdBy']);
 
     return updatedOrganizationData;
   }

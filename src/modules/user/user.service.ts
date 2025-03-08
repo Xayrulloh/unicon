@@ -14,13 +14,13 @@ export class UserService {
 
   async createAdmin(data: CreateAdminDto): Promise<UserI> {
     const [admin] = await this.knexService
-      .knex<UserI>('users')
+      .knex('users')
       .insert({
         name: data.name,
         role: Role.ADMIN,
         created_by: undefined,
       })
-      .returning('*');
+      .returning<UserI[]>(['id', 'name', 'role', 'created_by as createdBy']);
 
     return admin;
   }
@@ -31,7 +31,7 @@ export class UserService {
 
   async createUser(data: CreateUserDto): Promise<UserI> {
     const admin = await this.knexService.findUserById(
-      data.created_by,
+      data.createdBy,
       'Admin not found',
     );
 
@@ -40,13 +40,13 @@ export class UserService {
     }
 
     const [user] = await this.knexService
-      .knex<UserI>('users')
+      .knex('users')
       .insert({
         name: data.name,
         role: data.role,
-        created_by: data.created_by,
+        created_by: data.createdBy,
       })
-      .returning('*');
+      .returning<UserI[]>(['id', 'name', 'role', 'created_by as createdBy']);
 
     return user;
   }

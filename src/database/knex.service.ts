@@ -92,7 +92,7 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
           .primary()
           .defaultTo(this.knex.raw('uuid_generate_v4()'));
         table
-          .uuid('org_id')
+          .uuid('organization_id')
           .references('id')
           .inTable('organizations')
           .onDelete('CASCADE');
@@ -111,7 +111,7 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
           .primary()
           .defaultTo(this.knex.raw('uuid_generate_v4()'));
         table
-          .uuid('org_id')
+          .uuid('organization_id')
           .references('id')
           .inTable('organizations')
           .onDelete('CASCADE');
@@ -159,7 +159,15 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
 
   // USER
   async findUserById(id: string, errorMessage?: string): Promise<UserI> {
-    const user = await this.knex<UserI>('users').where({ id }).first();
+    const user = await this.knex('users')
+      .select<UserI>({
+        id: 'users.id',
+        name: 'users.name',
+        role: 'users.role',
+        createdBy: 'users.created_by',
+      })
+      .where({ id })
+      .first();
 
     if (!user) {
       throw new NotFoundException(errorMessage || 'User not found');
@@ -197,7 +205,18 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
 
   // TASK
   async findTaskById(id: string, errorMessage?: string): Promise<TaskI> {
-    const task = await this.knex<TaskI>('tasks').where({ id }).first();
+    const task = await this.knex<TaskI>('tasks')
+      .select({
+        id: 'tasks.id',
+        status: 'tasks.status',
+        projectId: 'tasks.project_id',
+        workerUserId: 'tasks.worker_user_id',
+        createdBy: 'tasks.created_by',
+        dueDate: 'tasks.due_date',
+        doneAt: 'tasks.done_at',
+      })
+      .where({ id })
+      .first();
 
     if (!task) {
       throw new NotFoundException(errorMessage || 'Task not found');

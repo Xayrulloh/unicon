@@ -15,45 +15,56 @@ export class TaskService {
   constructor(private readonly knexService: KnexService) {}
 
   async createTask(data: CreateFindTaskDto): Promise<TaskI> {
-    await this.knexService.findUserById(data.created_by, 'Manager not found');
+    await this.knexService.findUserById(data.createdBy, 'Manager not found');
 
     await this.knexService.findProjectById(data.projectId);
 
     await this.knexService.findUserById(data.workerUserId, 'Worker not found');
 
     const [createdTask] = await this.knexService
-      .knex<TaskI>('tasks')
+      .knex('tasks')
       .insert(data)
-      .returning('*');
+      .returning<
+        TaskI[]
+      >(['id', 'status', 'project_id as projectId', 'worker_user_id as workerUserId', 'created_by as createdBy', 'due_date as dueDate', 'done_at as doneAt']);
 
     return createdTask;
   }
 
   async getTasksByProject(data: GetTasksByProject): Promise<TaskI[]> {
-    return this.knexService.knex<TaskI>('tasks').where(data).returning('*');
+    return this.knexService
+      .knex('tasks')
+      .where(data)
+      .returning<
+        TaskI[]
+      >(['id', 'status', 'project_id as projectId', 'worker_user_id as workerUserId', 'created_by as createdBy', 'due_date as dueDate', 'done_at as doneAt']);
   }
 
   async getTasksForStaff(data: GetTasksForStaff): Promise<TaskI[]> {
-    return this.knexService.knex<TaskI>('tasks').where(data).returning('*');
+    return this.knexService
+      .knex('tasks')
+      .where(data)
+      .returning<
+        TaskI[]
+      >(['id', 'status', 'project_id as projectId', 'worker_user_id as workerUserId', 'created_by as createdBy', 'due_date as dueDate', 'done_at as doneAt']);
   }
 
   async updateTask(taskId: string, data: UpdateFindTaskDto): Promise<TaskI> {
     const task = await this.knexService.findTaskById(taskId);
 
-    await this.knexService.findUserById(task.created_by, 'Manager not found');
+    await this.knexService.findUserById(task.createdBy, 'Manager not found');
 
-    await this.knexService.findProjectById(task.project_id);
+    await this.knexService.findProjectById(task.projectId);
 
-    await this.knexService.findUserById(
-      task.worker_user_id,
-      'Worker not found',
-    );
+    await this.knexService.findUserById(task.workerUserId, 'Worker not found');
 
     const [updatedTask] = await this.knexService
-      .knex<TaskI>('tasks')
+      .knex('tasks')
       .where({ id: taskId })
       .update(data)
-      .returning('*');
+      .returning<
+        TaskI[]
+      >(['id', 'status', 'project_id as projectId', 'worker_user_id as workerUserId', 'created_by as createdBy', 'due_date as dueDate', 'done_at as doneAt']);
 
     return updatedTask;
   }
@@ -61,7 +72,7 @@ export class TaskService {
   async accomplishTask(taskId: string): Promise<TaskI | { message: string }> {
     const task = await this.knexService.findTaskById(taskId);
 
-    const dueDate = new Date(task.due_date);
+    const dueDate = new Date(task.dueDate);
     const time = Date.now() - dueDate.getMilliseconds();
 
     if (time <= 0) {
@@ -71,13 +82,21 @@ export class TaskService {
     }
 
     const [updatedTask] = await this.knexService
-      .knex<TaskI>('tasks')
+      .knex('tasks')
       .where({ id: taskId })
       .update({
         status: TaskStatus.DONE,
         done_at: new Date().toISOString(),
       })
-      .returning('*');
+      .returning<TaskI[]>([
+        'id',
+        'status',
+        'project_id as projectId',
+        'worker_user_id as workerUserId',
+        'created_by as createdBy',
+        'due_date as dueDate',
+        'done_at as doneAt',
+      ]);
 
     return updatedTask;
   }

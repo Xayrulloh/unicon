@@ -2,7 +2,10 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { KnexService } from 'src/database/knex.service';
 import { CreateProjectDto, UpdateProjectDto } from './project.dto';
 import { Role } from 'src/utils/enums';
-import { ProjectI } from 'src/common/interface/basic.interface';
+import {
+  OrganizationUserI,
+  ProjectI,
+} from 'src/common/interface/basic.interface';
 
 @Injectable()
 export class ProjectService {
@@ -10,29 +13,27 @@ export class ProjectService {
 
   async createProject(data: CreateProjectDto): Promise<ProjectI> {
     const user = await this.knexService.findUserById(
-      data.created_by,
+      data.createdBy,
       'User not found',
     );
 
     const organizationUsers = await this.knexService
-      .knex<{
-        id: string;
-        org_id: string;
-        user_id: string;
-      }>('organization_user')
-      .where({ org_id: data.organizationId });
+      .knex<OrganizationUserI>('organization_user')
+      .where({ organizationId: data.organizationId });
 
     const isManager = organizationUsers.find(
       (orgUser) =>
-        orgUser.user_id === data.created_by && user.role === Role.MANAGER,
+        orgUser.userId === data.createdBy && user.role === Role.MANAGER,
     );
 
     if (!isManager) throw new UnauthorizedException();
 
     const [project] = await this.knexService
-      .knex<ProjectI>('projects')
+      .knex('projects')
       .insert(data)
-      .returning('*');
+      .returning<
+        ProjectI[]
+      >(['id', 'name', 'created_by as createdBy', 'organization_id as organizationId']);
 
     return project;
   }
@@ -48,10 +49,12 @@ export class ProjectService {
     await this.knexService.findProjectById(projectId);
 
     const [updatedProject] = await this.knexService
-      .knex<ProjectI>('projects')
+      .knex('projects')
       .where({ id: projectId })
       .update(data)
-      .returning('*');
+      .returning<
+        ProjectI[]
+      >(['id', 'name', 'created_by as createdBy', 'organization_id as organizationId']);
 
     return updatedProject;
   }

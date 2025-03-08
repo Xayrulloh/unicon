@@ -4,28 +4,34 @@ export interface UserI {
   id: string;
   name: string;
   role: Role;
-  created_by: string;
+  createdBy: string;
 }
 
 export interface TaskI {
   id: string;
   status: TaskStatus;
-  project_id: string;
-  worker_user_id: string;
-  created_by: string;
-  due_date: string;
-  done_at: string;
+  projectId: string;
+  workerUserId: string;
+  createdBy: string;
+  dueDate: string;
+  doneAt: string;
 }
 
 export interface ProjectI {
   id: string;
   name: string;
   organizationId: string;
-  created_by: string;
+  createdBy: string;
 }
 
 export interface OrganizationI {
   id: string;
   name: string;
-  created_by: string;
+  createdBy: string;
+}
+
+export interface OrganizationUserI {
+  id: string;
+  organizationId: string;
+  userId: string;
 }

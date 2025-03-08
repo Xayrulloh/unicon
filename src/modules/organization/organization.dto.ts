@@ -10,7 +10,7 @@ export class CreateOrganizationDto {
 
   @ApiProperty()
   @IsUUID()
-  created_by: string;
+  createdBy: string;
 }
 
 export class UpdateOrganizationDto {
@@ -20,7 +20,7 @@ export class UpdateOrganizationDto {
 
   @ApiProperty()
   @IsUUID()
-  created_by: string;
+  createdBy: string;
 }
 
 export class AttachStaffOrganizationDto {
@@ -34,7 +34,7 @@ export class AttachStaffOrganizationDto {
 
   @ApiProperty()
   @IsUUID()
-  created_by: string;
+  createdBy: string;
 }
 
 // Response
@@ -46,5 +46,5 @@ export class FindOrganizationDto implements OrganizationI {
   name: string;
 
   @ApiProperty()
-  created_by: string;
+  createdBy: string;
 }

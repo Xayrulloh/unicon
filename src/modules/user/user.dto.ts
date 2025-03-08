@@ -15,7 +15,7 @@ export class CreateUserDto {
 
   @ApiProperty()
   @IsUUID()
-  created_by: string;
+  createdBy: string;
 }
 
 export class CreateAdminDto {
@@ -36,5 +36,5 @@ export class FindUserDto implements UserI {
   role: Role;
 
   @ApiProperty()
-  created_by: string;
+  createdBy: string;
 }

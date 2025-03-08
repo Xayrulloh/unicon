@@ -13,7 +13,7 @@ export class CreateProjectDto {
 
   @ApiProperty()
   @IsUUID()
-  created_by: string;
+  createdBy: string;
 }
 
 export class UpdateProjectDto extends PartialType(
@@ -32,5 +32,5 @@ export class FindProjectDto implements ProjectI {
   organizationId: string;
 
   @ApiProperty()
-  created_by: string;
+  createdBy: string;
 }
