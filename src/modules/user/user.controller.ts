@@ -13,22 +13,22 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly service: UserService) {}
 
-  @Post('create/admin')
-  @ApiOperation({ summary: 'admin create' })
+  @Post('admin')
+  @ApiOperation({ summary: 'Create admin' })
   @ApiCreatedResponse({ type: FindAllUsersDto })
   createAdmin(@Body() data: CreateAdminDto): Promise<FindAllUsersDto> {
     return this.service.createAdmin(data);
   }
 
-  @Get('get/list')
-  @ApiOperation({ summary: 'get all users' })
+  @Get('list')
+  @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ type: FindAllUsersDto, isArray: true })
   getAllUsers(): Promise<FindAllUsersDto[]> {
     return this.service.getAllUsers();
   }
 
-  @Post('create')
-  @ApiOperation({ summary: 'user create' })
+  @Post()
+  @ApiOperation({ summary: 'Create user if you are admin' })
   @ApiCreatedResponse({ type: FindAllUsersDto })
   createUser(@Body() data: CreateUserDto): Promise<FindAllUsersDto> {
     return this.service.createUser(data);

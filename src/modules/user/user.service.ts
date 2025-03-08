@@ -25,31 +25,27 @@ export class UserService {
   }
 
   async createAdmin(data: CreateAdminDto): Promise<FindAllUsersDto> {
-    const [admin] = (await this.knexService
-      .knex('users')
+    const [admin] = await this.knexService
+      .knex<FindAllUsersDto>('users')
       .insert({
         name: data.name,
         role: Role.ADMIN,
-        created_by: null,
+        created_by: undefined,
       })
-      .returning('*')) as FindAllUsersDto[];
+      .returning('*');
 
     return admin;
   }
 
   async getAllUsers(): Promise<FindAllUsersDto[]> {
-    const users = (await this.knexService
-      .knex('users')
-      .select('*')) as FindAllUsersDto[];
-
-    return users;
+    return this.knexService.knex('users').select('*');
   }
 
   async createUser(data: CreateUserDto): Promise<FindAllUsersDto> {
-    const admin = (await this.knexService
-      .knex('users')
+    const admin = await this.knexService
+      .knex<FindAllUsersDto>('users')
       .where({ id: data.created_by })
-      .first()) as FindAllUsersDto;
+      .first();
 
     if (!admin) {
       throw new NotFoundException('Admin not found');
@@ -59,14 +55,14 @@ export class UserService {
       throw new UnauthorizedException('Only admin can create user');
     }
 
-    const [user] = (await this.knexService
-      .knex('users')
+    const [user] = await this.knexService
+      .knex<FindAllUsersDto>('users')
       .insert({
         name: data.name,
         role: data.role,
         created_by: data.created_by,
       })
-      .returning('*')) as FindAllUsersDto[];
+      .returning('*');
 
     return user;
   }
