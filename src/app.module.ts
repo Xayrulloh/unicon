@@ -3,9 +3,16 @@ import { DatabaseModule } from './database/knex.module';
 import { EnvModule } from './config/env/env.module';
 import { UserModule } from './modules/user/user.module';
 import { OrganizationModule } from './modules/organization/organization.module';
+import { ProjectModule } from './modules/project/project.module';
 
 @Module({
-  imports: [EnvModule, DatabaseModule, UserModule, OrganizationModule],
+  imports: [
+    EnvModule,
+    DatabaseModule,
+    UserModule,
+    OrganizationModule,
+    ProjectModule,
+  ],
   controllers: [],
   providers: [],
 })
