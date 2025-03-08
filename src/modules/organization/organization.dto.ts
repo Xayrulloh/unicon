@@ -1,4 +1,4 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsUUID } from 'class-validator';
 import { OrganizationI } from 'src/common/interface/basic.interface';
 
@@ -13,7 +13,15 @@ export class CreateOrganizationDto {
   created_by: string;
 }
 
-export class UpdateOrganizationDto extends PartialType(CreateOrganizationDto) {}
+export class UpdateOrganizationDto {
+  @ApiProperty()
+  @IsString()
+  name?: string;
+
+  @ApiProperty()
+  @IsUUID()
+  created_by: string;
+}
 
 export class AttachStaffOrganizationDto {
   @ApiProperty()

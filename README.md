@@ -31,6 +31,28 @@
 $ pnpm install
 ```
 
+## Env
+
+Copy `.env.example` to `.env` file
+
+```bash
+$ cp .env.example .env
+```
+
+## Docker Compose
+
+Run the following command to start the container
+
+```bash
+$ docker compose up -d
+```
+
+Run the following command to stop the container
+
+```bash
+$ docker compose down
+```
+
 ## Compile and run the project
 
 ```bash
@@ -42,14 +64,6 @@ $ pnpm run start:dev
 
 # production mode
 $ pnpm run start:prod
-```
-
-## Env
-
-Copy `.env.example` to `.env` file
-
-```bash
-$ cp .env.example .env
 ```
 
 ## Docs Swagger

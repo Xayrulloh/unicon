@@ -3,9 +3,16 @@ import {
   OnModuleInit,
   OnModuleDestroy,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import knex, { Knex } from 'knex';
+import {
+  OrganizationI,
+  ProjectI,
+  TaskI,
+  UserI,
+} from 'src/common/interface/basic.interface';
 
 @Injectable()
 export class KnexService implements OnModuleInit, OnModuleDestroy {
@@ -146,5 +153,56 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
         table.timestamp('done_at');
       });
     }
+  }
+
+  // DRY PRINCIPLE
+
+  // USER
+  async findUserById(id: string, errorMessage?: string): Promise<UserI> {
+    const user = await this.knex<UserI>('users').where({ id }).first();
+
+    if (!user) {
+      throw new NotFoundException(errorMessage || 'User not found');
+    }
+
+    return user;
+  }
+
+  // ORGANIZATION
+  async findOrganizationById(
+    id: string,
+    errorMessage?: string,
+  ): Promise<OrganizationI> {
+    const organization = await this.knex<OrganizationI>('organizations')
+      .where({ id })
+      .first();
+
+    if (!organization) {
+      throw new NotFoundException(errorMessage || 'Organization not found');
+    }
+
+    return organization;
+  }
+
+  // PROJECT
+  async findProjectById(id: string, errorMessage?: string): Promise<ProjectI> {
+    const project = await this.knex<ProjectI>('projects').where({ id }).first();
+
+    if (!project) {
+      throw new NotFoundException(errorMessage || 'Project not found');
+    }
+
+    return project;
+  }
+
+  // TASK
+  async findTaskById(id: string, errorMessage?: string): Promise<TaskI> {
+    const task = await this.knex<TaskI>('tasks').where({ id }).first();
+
+    if (!task) {
+      throw new NotFoundException(errorMessage || 'Task not found');
+    }
+
+    return task;
   }
 }

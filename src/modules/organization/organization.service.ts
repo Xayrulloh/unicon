@@ -1,15 +1,10 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { KnexService } from 'src/database/knex.service';
 import {
   AttachStaffOrganizationDto,
   CreateOrganizationDto,
   UpdateOrganizationDto,
 } from './organization.dto';
-import { FindUserDto } from '../user/user.dto';
 import { Role } from 'src/utils/enums';
 import { OrganizationI } from 'src/common/interface/basic.interface';
 
@@ -24,14 +19,7 @@ export class OrganizationService {
   async createOrganization(
     organization: CreateOrganizationDto,
   ): Promise<CreateOrganizationDto> {
-    const user = await this.knexService
-      .knex<FindUserDto>('users')
-      .where({ id: organization.created_by })
-      .first();
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    const user = await this.knexService.findUserById(organization.created_by);
 
     if (user.role !== Role.ADMIN) {
       throw new UnauthorizedException('Only admin can create organization');
@@ -48,27 +36,13 @@ export class OrganizationService {
   async attachStaffOrganization(
     data: AttachStaffOrganizationDto,
   ): Promise<AttachStaffOrganizationDto> {
-    const user = await this.knexService
-      .knex<FindUserDto>('users')
-      .where({ id: data.created_by })
-      .first();
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    const user = await this.knexService.findUserById(data.created_by);
 
     if (user.role !== Role.ADMIN) {
       throw new UnauthorizedException('Only admin can attach staff');
     }
 
-    const stuff = await this.knexService
-      .knex<FindUserDto>('users')
-      .where({ id: data.userId })
-      .first();
-
-    if (!stuff) {
-      throw new NotFoundException('Stuff not found');
-    }
+    await this.knexService.findUserById(data.userId, 'Stuff not found');
 
     const [organizationStuff] = await this.knexService
       .knex<AttachStaffOrganizationDto>('organization_user')
@@ -82,27 +56,13 @@ export class OrganizationService {
     organizationId: string,
     organization: UpdateOrganizationDto,
   ): Promise<OrganizationI> {
-    const user = await this.knexService
-      .knex<FindUserDto>('users')
-      .where({ id: organization.created_by })
-      .first();
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    const user = await this.knexService.findUserById(organization.created_by);
 
     if (user.role !== Role.ADMIN) {
       throw new UnauthorizedException('Only admin can update organization');
     }
 
-    const organizationData = await this.knexService
-      .knex<OrganizationI>('organizations')
-      .where({ id: organizationId })
-      .first();
-
-    if (!organizationData) {
-      throw new NotFoundException('Organization not found');
-    }
+    await this.knexService.findOrganizationById(organizationId);
 
     const [updatedOrganizationData] = await this.knexService
       .knex<OrganizationI>('organizations')
@@ -114,14 +74,7 @@ export class OrganizationService {
   }
 
   async deleteOrganization(organizationId: string): Promise<void> {
-    const organizationData = await this.knexService
-      .knex<OrganizationI>('organizations')
-      .where({ id: organizationId })
-      .first();
-
-    if (!organizationData) {
-      throw new NotFoundException('Organization not found');
-    }
+    await this.knexService.findOrganizationById(organizationId);
 
     await this.knexService
       .knex<OrganizationI>('organizations')

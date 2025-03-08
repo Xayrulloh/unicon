@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import { KnexService } from 'src/database/knex.service';
 import {
@@ -7,7 +7,6 @@ import {
   GetTasksForStaff,
   UpdateFindTaskDto,
 } from './task.dto';
-import { FindUserDto } from '../user/user.dto';
 import { TaskStatus } from 'src/utils/enums';
 import { TaskI } from 'src/common/interface/basic.interface';
 
@@ -16,26 +15,11 @@ export class TaskService {
   constructor(private readonly knexService: KnexService) {}
 
   async createTask(data: CreateFindTaskDto): Promise<TaskI> {
-    const creator = await this.knexService
-      .knex<FindUserDto>('users')
-      .where({ id: data.created_by })
-      .first();
+    await this.knexService.findUserById(data.created_by, 'Manager not found');
 
-    if (!creator) throw new NotFoundException('Manager not found');
+    await this.knexService.findProjectById(data.projectId);
 
-    const project = await this.knexService
-      .knex<TaskI>('projects')
-      .where({ id: data.projectId })
-      .first();
-
-    if (!project) throw new NotFoundException('Project not found');
-
-    const worker = await this.knexService
-      .knex<FindUserDto>('users')
-      .where({ id: data.workerUserId })
-      .first();
-
-    if (!worker) throw new NotFoundException('Worker not found');
+    await this.knexService.findUserById(data.workerUserId, 'Worker not found');
 
     const [createdTask] = await this.knexService
       .knex<TaskI>('tasks')
@@ -54,33 +38,16 @@ export class TaskService {
   }
 
   async updateTask(taskId: string, data: UpdateFindTaskDto): Promise<TaskI> {
-    const task = await this.knexService
-      .knex<TaskI>('tasks')
-      .where({ id: taskId })
-      .first();
+    const task = await this.knexService.findTaskById(taskId);
 
-    if (!task) throw new NotFoundException('Task not found');
+    await this.knexService.findUserById(task.created_by, 'Manager not found');
 
-    const creator = await this.knexService
-      .knex<FindUserDto>('users')
-      .where({ id: task.created_by })
-      .first();
+    await this.knexService.findProjectById(task.project_id);
 
-    if (!creator) throw new NotFoundException('Manager not found');
-
-    const project = await this.knexService
-      .knex<TaskI>('projects')
-      .where({ id: task.project_id })
-      .first();
-
-    if (!project) throw new NotFoundException('Project not found');
-
-    const worker = await this.knexService
-      .knex<FindUserDto>('users')
-      .where({ id: task.worker_user_id })
-      .first();
-
-    if (!worker) throw new NotFoundException('Worker not found');
+    await this.knexService.findUserById(
+      task.worker_user_id,
+      'Worker not found',
+    );
 
     const [updatedTask] = await this.knexService
       .knex<TaskI>('tasks')
@@ -92,14 +59,7 @@ export class TaskService {
   }
 
   async accomplishTask(taskId: string): Promise<TaskI | { message: string }> {
-    const task = await this.knexService
-      .knex<TaskI>('tasks')
-      .where({ id: taskId })
-      .first();
-
-    if (!task) {
-      throw new NotFoundException('Task not found');
-    }
+    const task = await this.knexService.findTaskById(taskId);
 
     const dueDate = new Date(task.due_date);
     const time = Date.now() - dueDate.getMilliseconds();
@@ -123,6 +83,8 @@ export class TaskService {
   }
 
   async deleteTask(taskId: string): Promise<void> {
+    await this.knexService.findTaskById(taskId);
+
     await this.knexService.knex<TaskI>('tasks').where({ id: taskId }).delete();
   }
 }

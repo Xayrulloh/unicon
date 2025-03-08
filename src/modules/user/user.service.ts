@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateAdminDto, CreateUserDto } from './user.dto';
 import { KnexService } from 'src/database/knex.service';
 import { Role } from 'src/utils/enums';
@@ -13,16 +9,7 @@ export class UserService {
   constructor(private readonly knexService: KnexService) {}
 
   async findOneUser(id: string): Promise<UserI> {
-    const user = await this.knexService
-      .knex<UserI>('users')
-      .where({ id })
-      .first();
-
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    return user;
+    return this.knexService.findUserById(id);
   }
 
   async createAdmin(data: CreateAdminDto): Promise<UserI> {
@@ -43,14 +30,10 @@ export class UserService {
   }
 
   async createUser(data: CreateUserDto): Promise<UserI> {
-    const admin = await this.knexService
-      .knex<UserI>('users')
-      .where({ id: data.created_by })
-      .first();
-
-    if (!admin) {
-      throw new NotFoundException('Admin not found');
-    }
+    const admin = await this.knexService.findUserById(
+      data.created_by,
+      'Admin not found',
+    );
 
     if (admin.role !== Role.ADMIN) {
       throw new UnauthorizedException('Only admin can create user');
