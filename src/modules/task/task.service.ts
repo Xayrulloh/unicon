@@ -75,7 +75,7 @@ export class TaskService {
       .where({ id: task.created_by })
       .first();
 
-    if (!creator) throw new NotFoundException('Chief not found');
+    if (!creator) throw new NotFoundException('Manager not found');
 
     const project = await this.knexService
       .knex<TaskDto>('projects')
