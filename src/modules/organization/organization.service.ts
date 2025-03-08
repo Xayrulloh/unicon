@@ -62,7 +62,7 @@ export class OrganizationService {
   }
 
   async updateOrganization(
-    organizationId: string,
+    organizationId: number,
     organization: UpdateOrganizationDto,
   ): Promise<OrganizationI> {
     const user = await this.knexService.findUserById(organization.createdBy);
@@ -82,7 +82,7 @@ export class OrganizationService {
     return updatedOrganizationData;
   }
 
-  async deleteOrganization(organizationId: string): Promise<void> {
+  async deleteOrganization(organizationId: number): Promise<void> {
     await this.knexService.findOrganizationById(organizationId);
 
     await this.knexService

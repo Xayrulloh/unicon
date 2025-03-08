@@ -1,28 +1,28 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsEnum, IsUUID } from 'class-validator';
+import { IsDateString, IsEnum, IsNumber } from 'class-validator';
 import { TaskI } from 'src/common/interface/basic.interface';
 import { TaskStatus } from 'src/utils/enums';
 
 // Request
-export class CreateFindTaskDto {
+export class CreateTaskDto {
   @ApiProperty()
-  @IsUUID()
-  projectId: string;
+  @IsNumber()
+  projectId: number;
 
   @ApiProperty()
-  @IsUUID()
-  workerUserId: string;
+  @IsNumber()
+  workerUserId: number;
 
   @ApiProperty()
-  @IsUUID()
-  createdBy: string;
+  @IsNumber()
+  createdBy: number;
 
   @ApiProperty()
   @IsDateString()
   dueDate: string;
 }
 
-export class UpdateFindTaskDto {
+export class UpdateTaskDto {
   @ApiProperty({ enum: TaskStatus })
   @IsEnum(TaskStatus)
   status: TaskStatus;
@@ -36,7 +36,7 @@ export class GetTasksForStaff {
   @ApiProperty({
     required: false,
   })
-  workerUserId?: string;
+  workerUserId?: number;
 
   @ApiProperty({
     required: false,
@@ -47,26 +47,26 @@ export class GetTasksForStaff {
 
 export class GetTasksByProject {
   @ApiProperty({ required: false })
-  projectId?: string;
+  projectId?: number;
 }
 
 // Response
 
 export class FindTaskDto implements TaskI {
   @ApiProperty()
-  id: string;
+  id: number;
 
   @ApiProperty({ enum: TaskStatus })
   status: TaskStatus;
 
   @ApiProperty()
-  projectId: string;
+  projectId: number;
 
   @ApiProperty()
-  workerUserId: string;
+  workerUserId: number;
 
   @ApiProperty()
-  createdBy: string;
+  createdBy: number;
 
   @ApiProperty()
   dueDate: string;

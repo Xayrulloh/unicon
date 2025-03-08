@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsString, IsUUID } from 'class-validator';
+import { IsEnum, IsNumber, IsString } from 'class-validator';
 import { UserI } from 'src/common/interface/basic.interface';
 import { Role } from 'src/utils/enums';
 
@@ -14,8 +14,8 @@ export class CreateUserDto {
   role: Role;
 
   @ApiProperty()
-  @IsUUID()
-  createdBy: string;
+  @IsNumber()
+  createdBy: number;
 }
 
 export class CreateAdminDto {
@@ -27,7 +27,7 @@ export class CreateAdminDto {
 // Response
 export class FindUserDto implements UserI {
   @ApiProperty()
-  id: string;
+  id: number;
 
   @ApiProperty()
   name: string;
@@ -36,5 +36,5 @@ export class FindUserDto implements UserI {
   role: Role;
 
   @ApiProperty()
-  createdBy: string;
+  createdBy: number;
 }

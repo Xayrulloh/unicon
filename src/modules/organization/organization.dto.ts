@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsUUID } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 import { OrganizationI } from 'src/common/interface/basic.interface';
 
 // Request
@@ -9,8 +9,8 @@ export class CreateOrganizationDto {
   name: string;
 
   @ApiProperty()
-  @IsUUID()
-  createdBy: string;
+  @IsNumber()
+  createdBy: number;
 }
 
 export class UpdateOrganizationDto {
@@ -19,32 +19,32 @@ export class UpdateOrganizationDto {
   name?: string;
 
   @ApiProperty()
-  @IsUUID()
-  createdBy: string;
+  @IsNumber()
+  createdBy: number;
 }
 
 export class AttachStaffOrganizationDto {
   @ApiProperty()
-  @IsUUID()
-  organizationId: string;
+  @IsNumber()
+  organizationId: number;
 
   @ApiProperty()
-  @IsUUID()
-  userId: string;
+  @IsNumber()
+  userId: number;
 
   @ApiProperty()
-  @IsUUID()
-  createdBy: string;
+  @IsNumber()
+  createdBy: number;
 }
 
 // Response
 export class FindOrganizationDto implements OrganizationI {
   @ApiProperty()
-  id: string;
+  id: number;
 
   @ApiProperty()
   name: string;
 
   @ApiProperty()
-  createdBy: string;
+  createdBy: number;
 }

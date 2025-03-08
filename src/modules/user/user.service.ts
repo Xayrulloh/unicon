@@ -8,7 +8,7 @@ import { UserI } from 'src/common/interface/basic.interface';
 export class UserService {
   constructor(private readonly knexService: KnexService) {}
 
-  async findOneUser(id: string): Promise<UserI> {
+  async findOneUser(id: number): Promise<UserI> {
     return this.knexService.findUserById(id);
   }
 

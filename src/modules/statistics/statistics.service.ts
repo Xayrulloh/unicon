@@ -7,7 +7,7 @@ export class StatisticsService {
   constructor(private readonly knexService: KnexService) {}
 
   async getStatOrganizationById(
-    organizationId: string,
+    organizationId: number,
   ): Promise<OrganizationStatDto | { message: string }> {
     const stat = await this.knexService
       .knex('organizations as o')
@@ -30,7 +30,7 @@ export class StatisticsService {
   }
 
   async getStatProjectById(
-    projectId: string,
+    projectId: number,
   ): Promise<ProjectStatDto | { message: string }> {
     const stat = await this.knexService
       .knex('projects as p')

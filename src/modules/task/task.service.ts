@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 
 import { KnexService } from 'src/database/knex.service';
 import {
-  CreateFindTaskDto,
+  CreateTaskDto,
   GetTasksByProject,
   GetTasksForStaff,
-  UpdateFindTaskDto,
+  UpdateTaskDto,
 } from './task.dto';
 import { TaskStatus } from 'src/utils/enums';
 import { TaskI } from 'src/common/interface/basic.interface';
@@ -14,7 +14,7 @@ import { TaskI } from 'src/common/interface/basic.interface';
 export class TaskService {
   constructor(private readonly knexService: KnexService) {}
 
-  async createTask(data: CreateFindTaskDto): Promise<TaskI> {
+  async createTask(data: CreateTaskDto): Promise<TaskI> {
     await this.knexService.findUserById(data.createdBy, 'Manager not found');
 
     await this.knexService.findProjectById(data.projectId);
@@ -49,7 +49,7 @@ export class TaskService {
       >(['id', 'status', 'project_id as projectId', 'worker_user_id as workerUserId', 'created_by as createdBy', 'due_date as dueDate', 'done_at as doneAt']);
   }
 
-  async updateTask(taskId: string, data: UpdateFindTaskDto): Promise<TaskI> {
+  async updateTask(taskId: number, data: UpdateTaskDto): Promise<TaskI> {
     const task = await this.knexService.findTaskById(taskId);
 
     await this.knexService.findUserById(task.createdBy, 'Manager not found');
@@ -69,7 +69,7 @@ export class TaskService {
     return updatedTask;
   }
 
-  async accomplishTask(taskId: string): Promise<TaskI | { message: string }> {
+  async accomplishTask(taskId: number): Promise<TaskI | { message: string }> {
     const task = await this.knexService.findTaskById(taskId);
 
     const dueDate = new Date(task.dueDate);
@@ -101,7 +101,7 @@ export class TaskService {
     return updatedTask;
   }
 
-  async deleteTask(taskId: string): Promise<void> {
+  async deleteTask(taskId: number): Promise<void> {
     await this.knexService.findTaskById(taskId);
 
     await this.knexService.knex<TaskI>('tasks').where({ id: taskId }).delete();

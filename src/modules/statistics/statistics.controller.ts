@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { StatisticsService } from './statistics.service';
 import { OrganizationStatDto, ProjectStatDto, StatDto } from './statistics.dto';
@@ -12,7 +12,7 @@ export class StatisticsController {
   @ApiOperation({ summary: 'get statistics by organization id' })
   @ApiResponse({ type: OrganizationStatDto })
   getStatOrganizationById(
-    @Param('id', new ParseUUIDPipe()) organizationId: string,
+    @Param('id', new ParseIntPipe()) organizationId: number,
   ): Promise<OrganizationStatDto | { message: string }> {
     return this.service.getStatOrganizationById(organizationId);
   }
@@ -21,7 +21,7 @@ export class StatisticsController {
   @ApiOperation({ summary: 'get statistics by project id' })
   @ApiResponse({ type: ProjectStatDto })
   getStatProjectById(
-    @Param('id', new ParseUUIDPipe()) projectId: string,
+    @Param('id', new ParseIntPipe()) projectId: number,
   ): Promise<ProjectStatDto | { message: string }> {
     return this.service.getStatProjectById(projectId);
   }

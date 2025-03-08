@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -17,11 +17,11 @@ import {
 } from '@nestjs/swagger';
 import { TaskService } from './task.service';
 import {
-  CreateFindTaskDto,
+  CreateTaskDto,
   GetTasksByProject,
   GetTasksForStaff,
   FindTaskDto,
-  UpdateFindTaskDto,
+  UpdateTaskDto,
 } from './task.dto';
 import { TaskI } from 'src/common/interface/basic.interface';
 
@@ -40,7 +40,7 @@ export class TaskController {
   @Post()
   @ApiOperation({ summary: 'Create task' })
   @ApiCreatedResponse({ type: FindTaskDto })
-  async createTask(@Body() task: CreateFindTaskDto): Promise<TaskI> {
+  async createTask(@Body() task: CreateTaskDto): Promise<TaskI> {
     return this.service.createTask(task);
   }
 
@@ -48,8 +48,8 @@ export class TaskController {
   @ApiOperation({ summary: 'Update task' })
   @ApiResponse({ type: FindTaskDto })
   async updateTask(
-    @Param('taskId', new ParseUUIDPipe()) taskId: string,
-    @Body() task: UpdateFindTaskDto,
+    @Param('taskId', new ParseIntPipe()) taskId: number,
+    @Body() task: UpdateTaskDto,
   ): Promise<TaskI> {
     return this.service.updateTask(taskId, task);
   }
@@ -58,7 +58,7 @@ export class TaskController {
   @ApiOperation({ summary: 'Accomplish task' })
   @ApiCreatedResponse({ type: FindTaskDto })
   async accomplishTask(
-    @Param('taskId', new ParseUUIDPipe()) taskId: string,
+    @Param('taskId', new ParseIntPipe()) taskId: number,
   ): Promise<TaskI | { message: string }> {
     return this.service.accomplishTask(taskId);
   }
@@ -73,7 +73,7 @@ export class TaskController {
   @Delete('/:id/manager')
   @ApiOperation({ summary: 'Delete task' })
   async deleteTask(
-    @Param('id', new ParseUUIDPipe()) taskId: string,
+    @Param('id', new ParseIntPipe()) taskId: number,
   ): Promise<void> {
     return this.service.deleteTask(taskId);
   }

@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
+  ParseIntPipe,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -57,7 +57,7 @@ export class OrganizationController {
   @ApiOperation({ summary: 'Update organization' })
   @ApiResponse({ type: FindOrganizationDto })
   updateOrganization(
-    @Param('id', new ParseUUIDPipe()) organizationId: string,
+    @Param('id', new ParseIntPipe()) organizationId: number,
     @Body() organization: UpdateOrganizationDto,
   ): Promise<OrganizationI> {
     return this.service.updateOrganization(organizationId, organization);
@@ -67,7 +67,7 @@ export class OrganizationController {
   @ApiOperation({ summary: 'Delete organization' })
   @ApiResponse({ type: FindOrganizationDto })
   deleteOrganization(
-    @Param('id', new ParseUUIDPipe()) organizationId: string,
+    @Param('id', new ParseIntPipe()) organizationId: number,
   ): Promise<void> {
     return this.service.deleteOrganization(organizationId);
   }

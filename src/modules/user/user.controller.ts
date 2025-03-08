@@ -21,7 +21,7 @@ export class UserController {
     return this.service.createAdmin(data);
   }
 
-  @Get('list')
+  @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ type: FindUserDto, isArray: true })
   getAllUsers(): Promise<UserI[]> {

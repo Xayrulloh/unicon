@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
-import { IsUUID, IsString } from 'class-validator';
+import { IsString, IsNumber } from 'class-validator';
 import { ProjectI } from 'src/common/interface/basic.interface';
 
 // Request
@@ -9,11 +9,11 @@ export class CreateProjectDto {
   name: string;
 
   @ApiProperty()
-  organizationId: string;
+  organizationId: number;
 
   @ApiProperty()
-  @IsUUID()
-  createdBy: string;
+  @IsNumber()
+  createdBy: number;
 }
 
 export class UpdateProjectDto extends PartialType(
@@ -23,14 +23,14 @@ export class UpdateProjectDto extends PartialType(
 // Response
 export class FindProjectDto implements ProjectI {
   @ApiProperty()
-  id: string;
+  id: number;
 
   @ApiProperty()
   name: string;
 
   @ApiProperty()
-  organizationId: string;
+  organizationId: number;
 
   @ApiProperty()
-  createdBy: string;
+  createdBy: number;
 }

@@ -1,37 +1,37 @@
 import { Role, TaskStatus } from 'src/utils/enums';
 
 export interface UserI {
-  id: string;
+  id: number;
   name: string;
   role: Role;
-  createdBy: string;
+  createdBy: number;
 }
 
 export interface TaskI {
-  id: string;
+  id: number;
   status: TaskStatus;
-  projectId: string;
-  workerUserId: string;
-  createdBy: string;
+  projectId: number;
+  workerUserId: number;
+  createdBy: number;
   dueDate: string;
   doneAt: string;
 }
 
 export interface ProjectI {
-  id: string;
+  id: number;
   name: string;
-  organizationId: string;
-  createdBy: string;
+  organizationId: number;
+  createdBy: number;
 }
 
 export interface OrganizationI {
-  id: string;
+  id: number;
   name: string;
-  createdBy: string;
+  createdBy: number;
 }
 
 export interface OrganizationUserI {
-  id: string;
-  organizationId: string;
-  userId: string;
+  id: number;
+  organizationId: number;
+  userId: number;
 }

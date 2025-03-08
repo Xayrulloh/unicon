@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
+  ParseIntPipe,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -41,7 +41,7 @@ export class ProjectController {
   @ApiOperation({ summary: 'Update project' })
   @ApiResponse({ type: FindProjectDto })
   async updateProject(
-    @Param('id', new ParseUUIDPipe()) projectId: string,
+    @Param('id', new ParseIntPipe()) projectId: number,
     @Body() project: CreateProjectDto,
   ): Promise<ProjectI> {
     return this.service.updateProject(projectId, project);
@@ -51,7 +51,7 @@ export class ProjectController {
   @ApiOperation({ summary: 'Delete project' })
   @ApiResponse({ type: FindProjectDto })
   async deleteProject(
-    @Param('id', new ParseUUIDPipe()) projectId: string,
+    @Param('id', new ParseIntPipe()) projectId: number,
   ): Promise<void> {
     return this.service.deleteProject(projectId);
   }

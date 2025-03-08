@@ -52,18 +52,14 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
       END $$;
     `);
 
-    await this.knex.raw('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
-
     if (!(await this.knex.schema.hasTable('users'))) {
       await this.knex.schema.createTable('users', (table) => {
-        table
-          .uuid('id')
-          .primary()
-          .defaultTo(this.knex.raw('uuid_generate_v4()'));
+        table.increments('id').primary();
         table.string('name', 32).notNullable();
         table.specificType('role', 'enum_role').notNullable();
         table
-          .uuid('created_by')
+          .integer('created_by')
+          .unsigned()
           .references('id')
           .inTable('users')
           .onDelete('SET NULL');
@@ -72,13 +68,11 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
 
     if (!(await this.knex.schema.hasTable('organizations'))) {
       await this.knex.schema.createTable('organizations', (table) => {
-        table
-          .uuid('id')
-          .primary()
-          .defaultTo(this.knex.raw('uuid_generate_v4()'));
+        table.increments('id').primary();
         table.string('name', 255).notNullable();
         table
-          .uuid('created_by')
+          .integer('created_by')
+          .unsigned()
           .references('id')
           .inTable('users')
           .onDelete('SET NULL');
@@ -87,17 +81,16 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
 
     if (!(await this.knex.schema.hasTable('organization_user'))) {
       await this.knex.schema.createTable('organization_user', (table) => {
+        table.increments('id').primary();
         table
-          .uuid('id')
-          .primary()
-          .defaultTo(this.knex.raw('uuid_generate_v4()'));
-        table
-          .uuid('organization_id')
+          .integer('organization_id')
+          .unsigned()
           .references('id')
           .inTable('organizations')
           .onDelete('CASCADE');
         table
-          .uuid('user_id')
+          .integer('user_id')
+          .unsigned()
           .references('id')
           .inTable('users')
           .onDelete('CASCADE');
@@ -106,17 +99,16 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
 
     if (!(await this.knex.schema.hasTable('projects'))) {
       await this.knex.schema.createTable('projects', (table) => {
+        table.increments('id').primary();
         table
-          .uuid('id')
-          .primary()
-          .defaultTo(this.knex.raw('uuid_generate_v4()'));
-        table
-          .uuid('organization_id')
+          .integer('organization_id')
+          .unsigned()
           .references('id')
           .inTable('organizations')
           .onDelete('CASCADE');
         table
-          .uuid('created_by')
+          .integer('created_by')
+          .unsigned()
           .references('id')
           .inTable('users')
           .onDelete('SET NULL');
@@ -126,22 +118,22 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
 
     if (!(await this.knex.schema.hasTable('tasks'))) {
       await this.knex.schema.createTable('tasks', (table) => {
+        table.increments('id').primary();
         table
-          .uuid('id')
-          .primary()
-          .defaultTo(this.knex.raw('uuid_generate_v4()'));
-        table
-          .uuid('created_by')
+          .integer('created_by')
+          .unsigned()
           .references('id')
           .inTable('users')
           .onDelete('SET NULL');
         table
-          .uuid('project_id')
+          .integer('project_id')
+          .unsigned()
           .references('id')
           .inTable('projects')
           .onDelete('CASCADE');
         table
-          .uuid('worker_user_id')
+          .integer('worker_user_id')
+          .unsigned()
           .references('id')
           .inTable('users')
           .onDelete('SET NULL');
@@ -158,7 +150,7 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
   // DRY PRINCIPLE
 
   // USER
-  async findUserById(id: string, errorMessage?: string): Promise<UserI> {
+  async findUserById(id: number, errorMessage?: string): Promise<UserI> {
     const user = await this.knex('users')
       .select<UserI>({
         id: 'users.id',
@@ -178,7 +170,7 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
 
   // ORGANIZATION
   async findOrganizationById(
-    id: string,
+    id: number,
     errorMessage?: string,
   ): Promise<OrganizationI> {
     const organization = await this.knex<OrganizationI>('organizations')
@@ -193,7 +185,7 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
   }
 
   // PROJECT
-  async findProjectById(id: string, errorMessage?: string): Promise<ProjectI> {
+  async findProjectById(id: number, errorMessage?: string): Promise<ProjectI> {
     const project = await this.knex<ProjectI>('projects').where({ id }).first();
 
     if (!project) {
@@ -204,7 +196,7 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
   }
 
   // TASK
-  async findTaskById(id: string, errorMessage?: string): Promise<TaskI> {
+  async findTaskById(id: number, errorMessage?: string): Promise<TaskI> {
     const task = await this.knex<TaskI>('tasks')
       .select({
         id: 'tasks.id',

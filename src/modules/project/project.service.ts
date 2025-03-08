@@ -43,7 +43,7 @@ export class ProjectService {
   }
 
   async updateProject(
-    projectId: string,
+    projectId: number,
     data: UpdateProjectDto,
   ): Promise<ProjectI> {
     await this.knexService.findProjectById(projectId);
@@ -59,7 +59,7 @@ export class ProjectService {
     return updatedProject;
   }
 
-  async deleteProject(projectId: string): Promise<void> {
+  async deleteProject(projectId: number): Promise<void> {
     await this.knexService.findProjectById(projectId);
 
     await this.knexService
