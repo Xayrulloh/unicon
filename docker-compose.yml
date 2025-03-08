@@ -9,7 +9,7 @@ services:
       POSTGRES_DB: unicon
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - '${POSTGRES_PORT}:5432'
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-db:/docker-entrypoint-initdb.d
