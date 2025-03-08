@@ -1,4 +1,9 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import knex, { Knex } from 'knex';
 
@@ -14,10 +19,9 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
       connection: this.configService.get('DATABASE_URL'),
     });
 
-    // Create tables if they don't exist
     await this.createTablesIfNotExist();
 
-    console.info('KnexService onModuleInit initialized');
+    Logger.log('Database connected');
   }
 
   async onModuleDestroy() {
@@ -25,7 +29,6 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
   }
 
   async createTablesIfNotExist() {
-    // Create enum types if they don't exist
     await this.knex.raw(`
       DO $$ BEGIN
         CREATE TYPE enum_role AS ENUM ('ADMIN', 'MANAGER', 'STAFF');
@@ -42,10 +45,8 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
       END $$;
     `);
 
-    // Create uuid-ossp extension if it doesn't exist
     await this.knex.raw('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
 
-    // Create users table if it doesn't exist
     if (!(await this.knex.schema.hasTable('users'))) {
       await this.knex.schema.createTable('users', (table) => {
         table
@@ -59,11 +60,9 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
           .references('id')
           .inTable('users')
           .onDelete('SET NULL');
-        table.timestamp('created_at').defaultTo(this.knex.fn.now());
       });
     }
 
-    // Create organizations table if it doesn't exist
     if (!(await this.knex.schema.hasTable('organizations'))) {
       await this.knex.schema.createTable('organizations', (table) => {
         table
@@ -76,11 +75,9 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
           .references('id')
           .inTable('users')
           .onDelete('SET NULL');
-        table.timestamp('created_at').defaultTo(this.knex.fn.now());
       });
     }
 
-    // Create organization_user table if it doesn't exist
     if (!(await this.knex.schema.hasTable('organization_user'))) {
       await this.knex.schema.createTable('organization_user', (table) => {
         table
@@ -97,11 +94,9 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
           .references('id')
           .inTable('users')
           .onDelete('CASCADE');
-        table.timestamp('created_at').defaultTo(this.knex.fn.now());
       });
     }
 
-    // Create projects table if it doesn't exist
     if (!(await this.knex.schema.hasTable('projects'))) {
       await this.knex.schema.createTable('projects', (table) => {
         table
@@ -119,11 +114,9 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
           .inTable('users')
           .onDelete('SET NULL');
         table.string('name', 255).notNullable();
-        table.timestamp('created_at').defaultTo(this.knex.fn.now());
       });
     }
 
-    // Create tasks table if it doesn't exist
     if (!(await this.knex.schema.hasTable('tasks'))) {
       await this.knex.schema.createTable('tasks', (table) => {
         table
@@ -151,7 +144,6 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
           .defaultTo('CREATED');
         table.timestamp('due_date');
         table.timestamp('done_at');
-        table.timestamp('created_at').defaultTo(this.knex.fn.now());
       });
     }
   }
