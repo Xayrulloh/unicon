@@ -47,6 +47,7 @@ $ pnpm run start:prod
 ## Env
 
 Copy `.env.example` to `.env` file
+
 ```bash
 $ cp .env.example .env
 ```
