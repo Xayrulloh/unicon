@@ -7,10 +7,12 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -19,40 +21,49 @@ import { CreateProjectDto, FindProjectDto } from './project.dto';
 import { ProjectI } from 'src/common/interface/basic.interface';
 
 @ApiTags('Project')
-@Controller('projects')
+@Controller('organizations')
 export class ProjectController {
   constructor(private readonly service: ProjectService) {}
 
-  @Get()
-  @ApiOperation({ summary: 'Get all projects' })
+  @Get('/:organizationId/projects')
+  @ApiOperation({ summary: 'Get organization projects' })
   @ApiResponse({ type: FindProjectDto, isArray: true })
-  async getAllProjects(): Promise<FindProjectDto[]> {
-    return this.service.getAllProjects();
+  async getAllProjects(
+    @Param('organizationId', new ParseIntPipe()) organizationId: number,
+  ): Promise<FindProjectDto[]> {
+    return this.service.getAllProjects(organizationId);
   }
 
-  @Post()
+  @Post('/:organizationId/projects')
   @ApiOperation({ summary: 'Create a new project' })
   @ApiCreatedResponse({ type: FindProjectDto })
-  async createProject(@Body() project: CreateProjectDto): Promise<ProjectI> {
-    return this.service.createProject(project);
+  async createProject(
+    @Param('organizationId', new ParseIntPipe()) organizationId: number,
+    @Body() project: CreateProjectDto,
+  ): Promise<ProjectI> {
+    return this.service.createProject(organizationId, project);
   }
 
-  @Patch('/:id/manager')
+  @Patch('/:organizationId/projects/:id')
   @ApiOperation({ summary: 'Update project' })
   @ApiResponse({ type: FindProjectDto })
   async updateProject(
+    @Param('organizationId', new ParseIntPipe()) organizationId: number,
     @Param('id', new ParseIntPipe()) projectId: number,
     @Body() project: CreateProjectDto,
   ): Promise<ProjectI> {
-    return this.service.updateProject(projectId, project);
+    return this.service.updateProject(organizationId, projectId, project);
   }
 
-  @Delete('/:id/manager')
+  @Delete('/:organizationId/projects/:id')
+  @ApiQuery({ name: 'createdBy', type: Number, required: true })
   @ApiOperation({ summary: 'Delete project' })
   @ApiResponse({ type: FindProjectDto })
   async deleteProject(
+    @Param('organizationId', new ParseIntPipe()) organizationId: number,
     @Param('id', new ParseIntPipe()) projectId: number,
+    @Query('createdBy', new ParseIntPipe()) createdBy: number,
   ): Promise<void> {
-    return this.service.deleteProject(projectId);
+    return this.service.deleteProject(organizationId, projectId, createdBy);
   }
 }

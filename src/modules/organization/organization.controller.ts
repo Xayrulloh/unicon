@@ -7,10 +7,12 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -24,7 +26,7 @@ import {
 import { OrganizationI } from 'src/common/interface/basic.interface';
 
 @ApiTags('Organization')
-@Controller('organization')
+@Controller('organizations')
 export class OrganizationController {
   constructor(private readonly service: OrganizationService) {}
 
@@ -44,7 +46,7 @@ export class OrganizationController {
     return this.service.createOrganization(data);
   }
 
-  @Post('attach/staff')
+  @Post('staff')
   @ApiOperation({ summary: 'Attach staff to organization' })
   @ApiResponse({ type: AttachStaffOrganizationDto })
   attachStaffOrganization(
@@ -64,11 +66,13 @@ export class OrganizationController {
   }
 
   @Delete(':id')
+  @ApiQuery({ name: 'createdBy', required: true, type: Number })
   @ApiOperation({ summary: 'Delete organization' })
   @ApiResponse({ type: FindOrganizationDto })
   deleteOrganization(
     @Param('id', new ParseIntPipe()) organizationId: number,
+    @Query('createdBy', new ParseIntPipe()) createdBy: number,
   ): Promise<void> {
-    return this.service.deleteOrganization(organizationId);
+    return this.service.deleteOrganization(organizationId, createdBy);
   }
 }

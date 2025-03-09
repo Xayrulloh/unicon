@@ -26,7 +26,11 @@ export class UserService {
   }
 
   async getAllUsers(): Promise<UserI[]> {
-    return this.knexService.knex('users').select('*');
+    return this.knexService
+      .knex('users')
+      .select<
+        UserI[]
+      >({ id: 'users.id', name: 'users.name', role: 'users.role', createdBy: 'users.created_by' });
   }
 
   async createUser(data: CreateUserDto): Promise<UserI> {

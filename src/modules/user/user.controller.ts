@@ -10,7 +10,7 @@ import { UserService } from './user.service';
 import { UserI } from 'src/common/interface/basic.interface';
 
 @ApiTags('User')
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly service: UserService) {}
 

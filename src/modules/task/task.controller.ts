@@ -18,7 +18,6 @@ import {
 import { TaskService } from './task.service';
 import {
   CreateTaskDto,
-  GetTasksByProject,
   GetTasksForStaff,
   FindTaskDto,
   UpdateTaskDto,
@@ -26,55 +25,85 @@ import {
 import { TaskI } from 'src/common/interface/basic.interface';
 
 ApiTags('Task');
-@Controller('tasks')
+@Controller('organizations')
 export class TaskController {
   constructor(private readonly service: TaskService) {}
 
-  @Get()
-  @ApiOperation({ summary: 'Get all tasks' })
+  @Get(':organizationId/projects/:projectId/tasks')
+  @ApiOperation({ summary: 'Get tasks by project' })
   @ApiResponse({ type: FindTaskDto, isArray: true })
-  async getTasksForStaff(@Query() query: GetTasksForStaff): Promise<TaskI[]> {
-    return this.service.getTasksForStaff(query);
+  async getTaskByProject(
+    @Param('organizationId', new ParseIntPipe()) organizationId: number,
+    @Param('projectId', new ParseIntPipe()) projectId: number,
+    @Query('createdBy', new ParseIntPipe()) createdBy: number,
+  ): Promise<TaskI[]> {
+    return this.service.getTasksByProject(organizationId, projectId, createdBy);
   }
 
-  @Post()
+  @Post(':organizationId/projects/:projectId/tasks')
   @ApiOperation({ summary: 'Create task' })
   @ApiCreatedResponse({ type: FindTaskDto })
-  async createTask(@Body() task: CreateTaskDto): Promise<TaskI> {
-    return this.service.createTask(task);
+  async createTask(
+    @Param('projectId', new ParseIntPipe()) projectId: number,
+    @Param('organizationId', new ParseIntPipe()) organizationId: number,
+    @Body() task: CreateTaskDto,
+  ): Promise<TaskI> {
+    return this.service.createTask(task, projectId, organizationId);
   }
 
-  @Patch('/:taskId')
+  @Patch(':organizationId/projects/:projectId/tasks/:taskId')
   @ApiOperation({ summary: 'Update task' })
   @ApiResponse({ type: FindTaskDto })
   async updateTask(
+    @Param('organizationId', new ParseIntPipe()) organizationId: number,
+    @Param('projectId', new ParseIntPipe()) projectId: number,
     @Param('taskId', new ParseIntPipe()) taskId: number,
     @Body() task: UpdateTaskDto,
   ): Promise<TaskI> {
-    return this.service.updateTask(taskId, task);
+    return this.service.updateTask(organizationId, projectId, taskId, task);
   }
 
-  @Post('/accomplish/:taskId')
+  @Delete(':organizationId/projects/:projectId/tasks/:taskId')
+  @ApiOperation({ summary: 'Delete task' })
+  async deleteTask(
+    @Param('organizationId', new ParseIntPipe()) organizationId: number,
+    @Param('projectId', new ParseIntPipe()) projectId: number,
+    @Param('taskId', new ParseIntPipe()) taskId: number,
+    @Query('createdBy', new ParseIntPipe()) createdBy: number,
+  ): Promise<void> {
+    return this.service.deleteTask(
+      organizationId,
+      projectId,
+      taskId,
+      createdBy,
+    );
+  }
+
+  @Get(':organizationId/projects/:projectId/tasks/staff')
+  @ApiOperation({ summary: 'Get staff project tasks' })
+  @ApiResponse({ type: FindTaskDto, isArray: true })
+  async getTasksForStaff(
+    @Query() query: GetTasksForStaff,
+    @Param('projectId', new ParseIntPipe()) projectId: number,
+    @Param('organizationId', new ParseIntPipe()) organizationId: number,
+  ): Promise<TaskI[]> {
+    return this.service.getTasksForStaff(query, projectId, organizationId);
+  }
+
+  @Post(':organizationId/projects/:projectId/tasks/:taskId/staff/accomplish')
   @ApiOperation({ summary: 'Accomplish task' })
   @ApiCreatedResponse({ type: FindTaskDto })
   async accomplishTask(
+    @Param('projectId', new ParseIntPipe()) projectId: number,
+    @Param('organizationId', new ParseIntPipe()) organizationId: number,
     @Param('taskId', new ParseIntPipe()) taskId: number,
+    @Query('staffId', new ParseIntPipe()) staffId: number,
   ): Promise<TaskI | { message: string }> {
-    return this.service.accomplishTask(taskId);
-  }
-
-  @Get('/:projectId')
-  @ApiOperation({ summary: 'Get tasks by project' })
-  @ApiResponse({ type: FindTaskDto, isArray: true })
-  async getTaskByProject(@Query() query: GetTasksByProject): Promise<TaskI[]> {
-    return this.service.getTasksByProject(query);
-  }
-
-  @Delete('/:id/manager')
-  @ApiOperation({ summary: 'Delete task' })
-  async deleteTask(
-    @Param('id', new ParseIntPipe()) taskId: number,
-  ): Promise<void> {
-    return this.service.deleteTask(taskId);
+    return this.service.accomplishTask(
+      organizationId,
+      projectId,
+      taskId,
+      staffId,
+    );
   }
 }

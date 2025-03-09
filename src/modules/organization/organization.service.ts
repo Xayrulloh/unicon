@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { KnexService } from 'src/database/knex.service';
 import {
   AttachStaffOrganizationDto,
@@ -6,22 +10,32 @@ import {
   UpdateOrganizationDto,
 } from './organization.dto';
 import { Role } from 'src/utils/enums';
-import { OrganizationI } from 'src/common/interface/basic.interface';
+import {
+  OrganizationI,
+  OrganizationUserI,
+} from 'src/common/interface/basic.interface';
 
 @Injectable()
 export class OrganizationService {
   constructor(private readonly knexService: KnexService) {}
 
   async getAllOrganizations(): Promise<OrganizationI[]> {
-    return this.knexService.knex('organizations').select('*');
+    return this.knexService.knex('organizations').select<OrganizationI[]>({
+      id: 'organizations.id',
+      name: 'organizations.name',
+      createdBy: 'organizations.created_by',
+    });
   }
 
   async createOrganization(
     organization: CreateOrganizationDto,
   ): Promise<CreateOrganizationDto> {
-    const user = await this.knexService.findUserById(organization.createdBy);
+    const admin = await this.knexService.findUserById(
+      organization.createdBy,
+      'Admin not found',
+    );
 
-    if (user.role !== Role.ADMIN) {
+    if (admin.role !== Role.ADMIN) {
       throw new UnauthorizedException('Only admin can create organization');
     }
 
@@ -39,13 +53,34 @@ export class OrganizationService {
   async attachStaffOrganization(
     data: AttachStaffOrganizationDto,
   ): Promise<AttachStaffOrganizationDto> {
-    const user = await this.knexService.findUserById(data.createdBy);
+    const admin = await this.knexService.findUserById(
+      data.createdBy,
+      'Admin not found',
+    );
 
-    if (user.role !== Role.ADMIN) {
+    if (admin.role !== Role.ADMIN) {
       throw new UnauthorizedException('Only admin can attach staff');
     }
 
-    await this.knexService.findUserById(data.userId, 'Stuff not found');
+    const staff = await this.knexService.findUserById(
+      data.userId,
+      'Stuff not found',
+    );
+
+    if (staff.role === Role.ADMIN) {
+      throw new BadRequestException('Admin cannot be attached');
+    }
+
+    await this.knexService.findOrganizationById(data.organizationId);
+
+    const isOrganizationStaffExist = await this.knexService
+      .knex('organization_user')
+      .where({ organization_id: data.organizationId, user_id: data.userId })
+      .first<OrganizationUserI>();
+
+    if (isOrganizationStaffExist) {
+      throw new BadRequestException('Organization staff already exist');
+    }
 
     const [organizationStuff] = await this.knexService
       .knex('organization_user')
@@ -65,9 +100,12 @@ export class OrganizationService {
     organizationId: number,
     organization: UpdateOrganizationDto,
   ): Promise<OrganizationI> {
-    const user = await this.knexService.findUserById(organization.createdBy);
+    const admin = await this.knexService.findUserById(
+      organization.createdBy,
+      'Admin not found',
+    );
 
-    if (user.role !== Role.ADMIN) {
+    if (admin.role !== Role.ADMIN) {
       throw new UnauthorizedException('Only admin can update organization');
     }
 
@@ -76,13 +114,27 @@ export class OrganizationService {
     const [updatedOrganizationData] = await this.knexService
       .knex('organizations')
       .where({ id: organizationId })
-      .update(organization)
+      .update({
+        name: organization.name,
+      })
       .returning<OrganizationI[]>(['id', 'name', 'created_by as createdBy']);
 
     return updatedOrganizationData;
   }
 
-  async deleteOrganization(organizationId: number): Promise<void> {
+  async deleteOrganization(
+    organizationId: number,
+    createdBy: number,
+  ): Promise<void> {
+    const admin = await this.knexService.findUserById(
+      createdBy,
+      'Admin not found',
+    );
+
+    if (admin.role !== Role.ADMIN) {
+      throw new UnauthorizedException('Only Admin can delete organization');
+    }
+
     await this.knexService.findOrganizationById(organizationId);
 
     await this.knexService

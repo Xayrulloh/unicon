@@ -186,7 +186,15 @@ export class KnexService implements OnModuleInit, OnModuleDestroy {
 
   // PROJECT
   async findProjectById(id: number, errorMessage?: string): Promise<ProjectI> {
-    const project = await this.knex<ProjectI>('projects').where({ id }).first();
+    const project = await this.knex('projects')
+      .where({ id })
+      .select<ProjectI>({
+        id: 'projects.id',
+        name: 'projects.name',
+        createdBy: 'projects.created_by',
+        organizationId: 'projects.organization_id',
+      })
+      .first();
 
     if (!project) {
       throw new NotFoundException(errorMessage || 'Project not found');

@@ -1,37 +1,112 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+# Project Management API
 
-## Project setup
+This API provides functionality for managing users, organizations, projects, tasks, and statistics. It supports role-based access control (RBAC) with different permissions for **Admin**, **Manager**, and **Staff** roles.
+
+---
+
+## Overview
+
+The system is structured as follows:
+
+- **Users**: Manage users and their roles.
+- **Organizations**: Organizations can be created and managed by Admins. Staff can be attached to organizations.
+- **Projects**: Projects belong to organizations and can be managed by Managers.
+- **Tasks**: Tasks belong to projects and can be created, updated, or deleted by Managers. Staff can update task statuses.
+- **Statistics**: Admins can view statistics for organizations, projects, and overall system usage.
+
+---
+
+## Endpoints
+
+### Users
+- **POST** `/users/admin`  
+  Create an admin user. (*)
+- **GET** `/users`  
+  Get all users. (*)
+- **POST** `/users`  
+  Create a staff user. (ADMIN)
+
+### Organizations
+- **POST** `/organizations`  
+  Create an organization. (ADMIN)
+- **GET** `/organizations`  
+  Get all organizations. (*)
+- **POST** `/organizations/staff`  
+  Attach staff to an organization. (ADMIN)
+- **PATCH** `/organizations`  
+  Update an organization. (ADMIN)
+- **DELETE** `/organizations`  
+  Delete an organization. (ADMIN)
+
+### Projects
+- **POST** `/organizations/:organizationId/projects`  
+  Create a project. (MANAGER)
+- **GET** `/organizations/:organizationId/projects`  
+  Get all projects in an organization. (MANAGER)
+- **PATCH** `/organizations/:organizationId/projects/:projectId`  
+  Update a project. (MANAGER)
+- **DELETE** `/organizations/:organizationId/projects/:projectId`  
+  Delete a project. (MANAGER)
+
+### Tasks
+- **POST** `/organizations/:organizationId/projects/:projectId/tasks`  
+  Create a task. (MANAGER)
+- **GET** `/organizations/:organizationId/projects/:projectId/tasks`  
+  Get all tasks in a project. (MANAGER)
+- **PATCH** `/organizations/:organizationId/projects/:projectId/tasks/:taskId`  
+  Update a task. (MANAGER)
+- **DELETE** `/organizations/:organizationId/projects/:projectId/tasks/:taskId`  
+  Delete a task. (MANAGER)
+- **GET** `/organizations/:organizationId/projects/:projectId/tasks/staff?status=string`  
+  Get all tasks for staff based on status. (STAFF)
+- **POST** `/organizations/:organizationId/projects/:projectId/tasks/staff/finished`  
+  Update task status (e.g., mark as finished). (STAFF)
+
+### Statistics
+- **GET** `/statistics/organizations/:organizationId`  
+  Get statistics for an organization. (ADMIN)
+- **GET** `/statistics/organizations/:organizationId/projects/:projectId`  
+  Get statistics for a project. (ADMIN)
+- **GET** `/statistics`  
+  Get overall system statistics. (ADMIN)
+
+---
+
+## Roles & Permissions
+
+- **Admin**:
+  - Can create and manage organizations.
+  - Can create and manage users.
+  - Can view statistics for organizations, projects, and overall system usage.
+
+- **Manager**:
+  - Can create, update, and delete projects.
+  - Can create, update, and delete tasks.
+  - Can assign tasks to staff.
+
+- **Staff**:
+  - Can view tasks assigned to them.
+  - Can update the status of tasks (e.g., mark as finished).
+
+- **Public (*)**:
+  - Some endpoints are accessible without authentication (e.g., creating an admin user or listing organizations).
+
+---
+
+## Notes
+- Replace `:organizationId`, `:projectId`, and `:taskId` with actual IDs in the URLs.
+
+---
+
+# Project setup
 
 ```bash
 $ pnpm install
 ```
 
-## Env
+# Env
 
 Copy `.env.example` to `.env` file
 
@@ -39,7 +114,7 @@ Copy `.env.example` to `.env` file
 $ cp .env.example .env
 ```
 
-## Docker Compose
+# Docker Compose
 
 Run the following command to start the container
 
@@ -53,7 +128,7 @@ Run the following command to stop the container
 $ docker compose down
 ```
 
-## Compile and run the project
+# Compile and run the project
 
 ```bash
 # development
@@ -66,6 +141,6 @@ $ pnpm run start:dev
 $ pnpm run start:prod
 ```
 
-## Docs Swagger
+# Docs Swagger
 
-**http://localhost:8080/docs**
+**http://localhost:8080/docs** or **http://localhost:${PORT}/docs/**

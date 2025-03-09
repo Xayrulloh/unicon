@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { OrganizationI } from 'src/common/interface/basic.interface';
 
 // Request
@@ -14,8 +14,9 @@ export class CreateOrganizationDto {
 }
 
 export class UpdateOrganizationDto {
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
+  @IsOptional()
   name?: string;
 
   @ApiProperty()
